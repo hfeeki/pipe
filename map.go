@@ -14,3 +14,17 @@ func (p *Pipe) Map(fn MapFunc) *Pipe {
 
 	return p
 }
+
+func (p *Pipe) mapperHandler(fn MapFunc, pos int) func() {
+	return func() {
+		for {
+			item, ok := <-p.prevChan(pos)
+			if !ok {
+				break
+			}
+
+			p.nextChan(pos) <- fn(item)
+		}
+		close(p.nextChan(pos))
+	}
+}

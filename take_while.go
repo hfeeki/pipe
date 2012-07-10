@@ -10,7 +10,7 @@ type TakeWhileFunc func(item interface{}) bool
 // Accept items from the input pipe until the given function returns false.
 // After that, all input messages will be ignored and the output channel will
 // be closed.
-func (p *Pipe) TakeWhile(fn TakeWhile) *Pipe {
+func (p *Pipe) TakeWhile(fn TakeWhileFunc) *Pipe {
 	p.addStage()
 	go p.takewhileHandler(fn, p.length-1)()
 

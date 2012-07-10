@@ -11,7 +11,7 @@ import (
 func TestFilterPipe(t *testing.T) {
 	in := make(chan interface{})
 	out := make(chan interface{})
-	NewPipe(in, out).FilterFunc(func(item interface{}) bool {
+	NewPipe(in, out).Filter(func(item interface{}) bool {
 		return (item.(int) % 2) == 0
 	})
 
