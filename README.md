@@ -67,9 +67,9 @@ input <- 5 // will come through as 7
 * ForEach(func(item interface{}))
 * Map(func(item interface{}) interface{})
 * Reduce(initial interface{}, func(accumulator interface{}, item interface{}) interface{})
-* Skip(n int64)
+* Skip(n int)
 * SkipWhile(func(item interface{}) bool)
-* Take(n int64)
+* Take(n int)
 * TakeWhile(func(item interface{}) bool)
 * Zip(other chan interface{})
 
@@ -107,7 +107,7 @@ func (p *Pipe) Reduce(initial interface{}, fn ReduceFunc) *Pipe
     then when the input channel is closed, pass the result to the output
     channel
 
-func (p *Pipe) Skip(num int64) *Pipe
+func (p *Pipe) Skip(num int) *Pipe
     Skip a given number of items from the input pipe. After that number has
     been dropped, the rest are passed straight through.
 
@@ -115,7 +115,7 @@ func (p *Pipe) SkipWhile(fn SkipWhileFunc) *Pipe
     Skip the items from the input pipe until the given function returns
     true. After that , the rest are passed straight through.
 
-func (p *Pipe) Take(num int64) *Pipe
+func (p *Pipe) Take(num int) *Pipe
     Accept only the given number of items from the input pipe. After that
     number has been received, all input messages will be ignored and the
     output channel will be closed.

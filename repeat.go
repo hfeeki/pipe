@@ -5,7 +5,7 @@
 package pipe
 
 // Generate an infinite sequence by repeating the value. Can be bounded by passing x.
-func Repeat(item interface{}, x ...int64) chan interface{} {
+func Repeat(item interface{}, x ...int) chan interface{} {
 	out := make(chan interface{})
 
 	if len(x) > 0 {
@@ -17,8 +17,8 @@ func Repeat(item interface{}, x ...int64) chan interface{} {
 	return out
 }
 
-func boundedRepeatHandler(item interface{}, bound int64, out chan interface{}) {
-	for i := int64(0); i < bound; i++ {
+func boundedRepeatHandler(item interface{}, bound int, out chan interface{}) {
+	for i := int(0); i < bound; i++ {
 		out <- item
 	}
 	close(out)

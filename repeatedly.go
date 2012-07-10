@@ -8,7 +8,7 @@ package pipe
 type RepeatedlyFunc func() interface{}
 
 // Generate an infinite sequence by repeatedly calling the given function. The output will be x, f(x), f(f(x)), etc...
-func Repeatedly(fn RepeatedlyFunc, x ...int64) chan interface{} {
+func Repeatedly(fn RepeatedlyFunc, x ...int) chan interface{} {
 	out := make(chan interface{})
 
 	if len(x) > 0 {
@@ -20,8 +20,8 @@ func Repeatedly(fn RepeatedlyFunc, x ...int64) chan interface{} {
 	return out
 }
 
-func boundedRepeatedlyHandler(fn RepeatedlyFunc, bound int64, out chan interface{}) {
-	for i := int64(0); i < bound; i++ {
+func boundedRepeatedlyHandler(fn RepeatedlyFunc, bound int, out chan interface{}) {
+	for i := int(0); i < bound; i++ {
 		out <- fn()
 	}
 	close(out)
