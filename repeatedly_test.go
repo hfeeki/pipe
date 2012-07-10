@@ -9,9 +9,9 @@ import (
 )
 
 func TestRepeatedly(t *testing.T) {
-  i := 0
+	i := 0
 	channel := Repeatedly(func() interface{} {
-    i++
+		i++
 		return i
 	})
 
@@ -24,9 +24,9 @@ func TestRepeatedly(t *testing.T) {
 }
 
 func TestRepeatedlyBounded(t *testing.T) {
-  i := 0
+	i := 0
 	channel := Repeatedly(func() interface{} {
-    i++
+		i++
 		return i
 	}, 3)
 
@@ -37,8 +37,8 @@ func TestRepeatedlyBounded(t *testing.T) {
 		}
 	}
 
-  _, ok := <-channel
-  if ok {
-    t.Fatal("Expected the bounded repeating channel to close after 3, but it stayed open")
-  }
+	_, ok := <-channel
+	if ok {
+		t.Fatal("Expected the bounded repeating channel to close after 3, but it stayed open")
+	}
 }

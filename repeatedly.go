@@ -11,25 +11,25 @@ type RepeatedlyFunc func() interface{}
 func Repeatedly(fn RepeatedlyFunc, x ...int64) chan interface{} {
 	out := make(chan interface{})
 
-  if len(x) > 0 {
-    go boundedRepeatedlyHandler(fn, x[0], out)
-  } else {
-    go unboundedRepeatedlyHandler(fn, out)
-  }
+	if len(x) > 0 {
+		go boundedRepeatedlyHandler(fn, x[0], out)
+	} else {
+		go unboundedRepeatedlyHandler(fn, out)
+	}
 
 	return out
 }
 
 func boundedRepeatedlyHandler(fn RepeatedlyFunc, bound int64, out chan interface{}) {
-  for i := int64(0); i < bound; i++ {
-    out <- fn()
-  }
-  close(out)
+	for i := int64(0); i < bound; i++ {
+		out <- fn()
+	}
+	close(out)
 }
 
 func unboundedRepeatedlyHandler(fn RepeatedlyFunc, out chan interface{}) {
-  for {
-    out <- fn()
-  }
-  close(out)
+	for {
+		out <- fn()
+	}
+	close(out)
 }
