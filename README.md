@@ -65,8 +65,8 @@ input <- 5 // will come through as 7
 
 ### NewPipe(in, out chan interface{})
 
-    Return a new Pipe object which echoes input to output. Additional
-    transformations can then be 'chained' onto the pipe, to modify the output.
+Return a new Pipe object which echoes input to output. Additional
+transformations can then be 'chained' onto the pipe, to modify the output.
 
 ## Generators
 
@@ -75,47 +75,47 @@ input channel.
 
 ### Iterate(func(item interface{}) interface{}, x interface{}) chan interface{}
 
-    Generate an infinite sequence by repeatedly calling the given function
-    with the previous value. The output will be x, f(x), f(f(x)), etc...
+Generate an infinite sequence by repeatedly calling the given function
+with the previous value. The output will be x, f(x), f(f(x)), etc...
 
 ### Range(start, end int, step ...int) chan interface{}
 
-    Generate an sequence of numbers from start (inclusive) to end
-    (exclusive) incrementing by step (default 1)
+Generate an sequence of numbers from start (inclusive) to end
+(exclusive) incrementing by step (default 1)
 
 ### Repeat(item interface{}, x ...int) chan interface{}
 
-    Generate an infinite sequence by repeating the value. Can be bounded by
-    passing x.
+Generate an infinite sequence by repeating the value. Can be bounded by
+passing x.
 
 ### Repeatedly(func() interface{}, x ...int) chan interface{}
 
-    Generate an infinite sequence by repeatedly calling the given function.
-    The function should take no arguments, and ideally be side-effect free.
-    The output will be x, f(x), f(f(x)), etc...
+Generate an infinite sequence by repeatedly calling the given function.
+The function should take no arguments, and ideally be side-effect free.
+The output will be x, f(x), f(f(x)), etc...
 
 ## Available Transformations
 
 ### Filter(func(item interface{}) bool)
 
-    Only pass through items when the filter returns true
+Only pass through items when the filter returns true
 
 ### ForEach(func(item interface{}))
 
-    Execute a function for each item (without modifying the item)
+Execute a function for each item (without modifying the item)
 
 ### Interleave(other chan interface{})
 
-    Alternate messages from each channel. Sending a message from the first
-    channel, then one from the second, etc... If either input channel
-    closes, the output will be closed.
+Alternate messages from each channel. Sending a message from the first
+channel, then one from the second, etc... If either input channel
+closes, the output will be closed.
 
 ### Interpose(item interface{})
 
-    Alternate messages from the channel with repeating the item. Sending a
-    message from the channel, then the item, etc... If the input channel
-    closes, the output will be closed. The final thing through the input
-    channel will be the final item from the output channel. e.g.
+Alternate messages from the channel with repeating the item. Sending a
+message from the channel, then the item, etc... If the input channel
+closes, the output will be closed. The final thing through the input
+channel will be the final item from the output channel. e.g.
 
 ```Go
 out := make(chan interface{})
@@ -130,52 +130,54 @@ NewPipe(Range(0,3), out).Interpose('a')
 
 ### Map(func(item interface{}) interface{})
 
-    Pass through the result of the map function for each item
+Pass through the result of the map function for each item
 
 ### Reduce(initial interface{}, func(accumulator interface{}, item interface{}) interface{})
 
-    Accumulate the result of the reduce function being called on each item,
-    then when the input channel is closed, pass the result to the output
-    channel
+Accumulate the result of the reduce function being called on each item,
+then when the input channel is closed, pass the result to the output
+channel
 
 ### Skip(n int)
 
-    Skip a given number of items from the input pipe. After that number has
-    been dropped, the rest are passed straight through.
+Skip a given number of items from the input pipe. After that number has
+been dropped, the rest are passed straight through.
 
 ### SkipWhile(func(item interface{}) bool)
 
-    Skip the items from the input pipe until the given function returns
-    true. After that , the rest are passed straight through.
+Skip the items from the input pipe until the given function returns
+true. After that , the rest are passed straight through.
 
 ### Take(n int)
 
-    Accept only the given number of items from the input pipe. After that
-    number has been received, all input messages will be ignored and the
-    output channel will be closed.
+Accept only the given number of items from the input pipe. After that
+number has been received, all input messages will be ignored and the
+output channel will be closed.
 
 ### TakeWhile(func(item interface{}) bool)
 
-    Accept items from the input pipe until the given function returns false.
-    After that, all input messages will be ignored and the output channel
-    will be closed.
+Accept items from the input pipe until the given function returns false.
+After that, all input messages will be ignored and the output channel
+will be closed.
 
 ### Zip(other chan interface{})
 
-    Group each message from the input channel with it's corresponding
-    message from the other channel. This will block on the first channel
-    until it receives a message, then block on the second until it gets one
-    from there. At that point an array containing both will be sent to the
-    output channel.
+Group each message from the input channel with it's corresponding
+message from the other channel. This will block on the first channel
+until it receives a message, then block on the second until it gets one
+from there. At that point an array containing both will be sent to the
+output channel.
 
-    For example, if channel a is being zipped with channel b, and output on
-    channel c:
+For example, if channel a is being zipped with channel b, and output on
+channel c:
 
+```Go
   a <- 1
   b <- 2
   result := <-c
+```
 
-    Here, result will equal []interface{}{1, 2}
+Here, result will equal []interface{}{1, 2}
 
 ## More Info
 
