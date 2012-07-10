@@ -4,7 +4,8 @@
 
 package pipe
 
-// Generate an infinite sequence by repeating the value. Can be bounded by passing x.
+// Generate an infinite sequence by repeating the value. Can be bounded by
+// passing x.
 func Repeat(item interface{}, x ...int) chan interface{} {
 	out := make(chan interface{})
 

@@ -4,7 +4,8 @@
 
 package pipe
 
-// Generate an sequence of numbers from start (inclusive) to end (exclusive) incrementing by step (default 1)
+// Generate an sequence of numbers from start (inclusive) to end (exclusive)
+// incrementing by step (default 1)
 func Range(start, end int, step ...int) chan interface{} {
 	out := make(chan interface{})
 

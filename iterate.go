@@ -7,7 +7,8 @@ package pipe
 // A function which can be used to iteratively generate data
 type IterateFunc func(previous interface{}) interface{}
 
-// Generate an infinite sequence by repeatedly calling the given function. The output will be x, f(x), f(f(x)), etc...
+// Generate an infinite sequence by repeatedly calling the given function with
+// the previous value. The output will be x, f(x), f(f(x)), etc...
 func Iterate(fn IterateFunc, x interface{}) chan interface{} {
 	out := make(chan interface{})
 
