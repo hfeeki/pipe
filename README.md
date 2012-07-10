@@ -61,71 +61,91 @@ input <- 1 // will be dropped
 input <- 5 // will come through as 7
 ```
 
+## Creating Pipes
+
+* NewPipe(in, out chan interface{}) *Pipe
+    Return a new Pipe object which echoes input to output. Additional
+    transformations can then be 'chained' onto the pipe, to modify the output.
+
+## Generators
+
+There are several generator functions included which can be used as a pipe's
+input channel.
+
+* Iterate(func(item interface{}) interface{}, x interface{}) chan interface{}
+    Generate an infinite sequence by repeatedly calling the given function
+    with the previous value. The output will be x, f(x), f(f(x)), etc...
+
+* Range(start, end int, step ...int) chan interface{}
+    Generate an sequence of numbers from start (inclusive) to end
+    (exclusive) incrementing by step (default 1)
+
+* Repeat(item interface{}, x ...int) chan interface{}
+    Generate an infinite sequence by repeating the value. Can be bounded by
+    passing x.
+
+* Repeatedly(func() interface{}, x ...int) chan interface{}
+    Generate an infinite sequence by repeatedly calling the given function.
+    The function should take no arguments, and ideally be side-effect free.
+    The output will be x, f(x), f(f(x)), etc...
+
 ## Available Transformations
 
 * Filter(func(item interface{}) bool)
-* ForEach(func(item interface{}))
-* Map(func(item interface{}) interface{})
-* Reduce(initial interface{}, func(accumulator interface{}, item interface{}) interface{})
-* Skip(n int64)
-* SkipWhile(func(item interface{}) bool)
-* Take(n int64)
-* TakeWhile(func(item interface{}) bool)
-* Zip(other chan interface{})
-
-## Godoc
-
-```
-type FilterFunc func(item interface{}) bool
-    A function which filters
-
-type ForEachFunc func(item interface{})
-    A function which foreachs
-
-type MapFunc func(item interface{}) interface{}
-    A function which mappers
-
-type Pipe struct {
-    // contains filtered or unexported fields
-}
-    A Pipe is a set of transforms being applied along the channel
-
-func NewPipe(in, out chan interface{}) *Pipe
-    Return a new Pipe object which echoes input to output
-
-func (p *Pipe) Filter(fn FilterFunc) *Pipe
     Only pass through items when the filter returns true
 
-func (p *Pipe) ForEach(fn ForEachFunc) *Pipe
+* ForEach(func(item interface{}))
     Execute a function for each item (without modifying the item)
 
-func (p *Pipe) Map(fn MapFunc) *Pipe
+* Interleave(other chan interface{})
+    Alternate messages from each channel. Sending a message from the first
+    channel, then one from the second, etc... If either input channel
+    closes, the output will be closed.
+
+* Interpose(item interface{})
+    Alternate messages from the channel with repeating the item. Sending a
+    message from the channel, then the item, etc... If the input channel
+    closes, the output will be closed. The final thing through the input
+    channel will be the final item from the output channel. e.g.
+
+```Go
+out := make(chan interface{})
+NewPipe(Range(0,3), out).Interpose('a')
+<-out // 0
+<-out // 'a'
+<-out // 1
+<-out // 'a'
+<-out // 2
+// output is now closed
+```
+
+* Map(func(item interface{}) interface{})
     Pass through the result of the map function for each item
 
-func (p *Pipe) Reduce(initial interface{}, fn ReduceFunc) *Pipe
+* Reduce(initial interface{}, func(accumulator interface{}, item interface{}) interface{})
     Accumulate the result of the reduce function being called on each item,
     then when the input channel is closed, pass the result to the output
     channel
 
-func (p *Pipe) Skip(num int64) *Pipe
+* Skip(n int)
     Skip a given number of items from the input pipe. After that number has
     been dropped, the rest are passed straight through.
 
-func (p *Pipe) SkipWhile(fn SkipWhileFunc) *Pipe
+* SkipWhile(func(item interface{}) bool)
     Skip the items from the input pipe until the given function returns
     true. After that , the rest are passed straight through.
 
-func (p *Pipe) Take(num int64) *Pipe
+* Take(n int)
     Accept only the given number of items from the input pipe. After that
     number has been received, all input messages will be ignored and the
     output channel will be closed.
 
-func (p *Pipe) TakeWhile(fn TakeWhile) *Pipe
+* TakeWhile(func(item interface{}) bool)
     Accept items from the input pipe until the given function returns false.
     After that, all input messages will be ignored and the output channel
     will be closed.
 
-func (p *Pipe) Zip(other chan interface{}) *Pipe
+* Zip(other chan interface{})
     Group each message from the input channel with it's corresponding
     message from the other channel. This will block on the first channel
     until it receives a message, then block on the second until it gets one
@@ -141,12 +161,6 @@ func (p *Pipe) Zip(other chan interface{}) *Pipe
 
     Here, result will equal []interface{}{1, 2}
 
-type ReduceFunc func(result, item interface{}) interface{}
-    A function which reduces
+## More Info
 
-type SkipWhileFunc func(item interface{}) bool
-    A function which skipwhiles
-
-type TakeWhileFunc func(item interface{}) bool
-    A function which takewhiles
-```
+See the ```godoc``` command for more information.

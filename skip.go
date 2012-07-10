@@ -6,15 +6,15 @@ package pipe
 
 // Skip a given number of items from the input pipe. After that number has been
 // dropped, the rest are passed straight through.
-func (p *Pipe) Skip(num int64) *Pipe {
+func (p *Pipe) Skip(num int) *Pipe {
 	p.addStage()
 	go p.skipperHandler(num, p.length-1)()
 
 	return p
 }
 
-func (p *Pipe) skipperHandler(num int64, pos int) func() {
-	var count int64
+func (p *Pipe) skipperHandler(num int, pos int) func() {
+	var count int
 	return func() {
 		// skip num items
 		for count = 0; count < num; count++ {
