@@ -97,6 +97,28 @@ input channel.
 * ForEach(func(item interface{}))
     Execute a function for each item (without modifying the item)
 
+* Interleave(other chan interface{})
+    Alternate messages from each channel. Sending a message from the first
+    channel, then one from the second, etc... If either input channel
+    closes, the output will be closed.
+
+* Interpose(item interface{})
+    Alternate messages from the channel with repeating the item. Sending a
+    message from the channel, then the item, etc... If the input channel
+    closes, the output will be closed. The final thing through the input
+    channel will be the final item from the output channel. e.g.
+
+```Go
+out := make(chan interface{})
+NewPipe(Range(0,3), out).Interpose('a')
+<-out // 0
+<-out // 'a'
+<-out // 1
+<-out // 'a'
+<-out // 2
+// output is now closed
+```
+
 * Map(func(item interface{}) interface{})
     Pass through the result of the map function for each item
 
