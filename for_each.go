@@ -4,27 +4,13 @@
 
 package pipe
 
-// Implement this interface in your object to pass it to Pipe.ForEach
-type ForEacher interface {
-	ForEach(item interface{})
-}
-
 // A function which foreachs
 type ForEachFunc func(item interface{})
 
 // Execute a function for each item (without modifying the item)
-func (p *Pipe) ForEachFunc(fn ForEachFunc) *Pipe {
+func (p *Pipe) ForEach(fn ForEachFunc) *Pipe {
 	p.addStage()
 	go p.foreachHandler(fn, p.length-1)()
-
-	return p
-}
-
-// Execute a function for each item (without modifying the item)
-func (p *Pipe) ForEach(t ForEacher) *Pipe {
-	p.ForEachFunc(func(item interface{}) {
-		t.ForEach(item)
-	})
 
 	return p
 }

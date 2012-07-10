@@ -8,20 +8,11 @@ import (
 	"testing"
 )
 
-type FakeForEacher struct {
-	count int
-}
-
-// Counts each item as it goes through
-func (t *FakeForEacher) ForEach(item interface{}) {
-	t.count++
-}
-
-func TestForEachFuncPipe(t *testing.T) {
+func TestForEachPipe(t *testing.T) {
 	in := make(chan interface{}, 5)
 	out := make(chan interface{}, 5)
 	count := 0
-	NewPipe(in, out).ForEachFunc(func(item interface{}) {
+	NewPipe(in, out).ForEach(func(item interface{}) {
 		count++
 	})
 
@@ -39,33 +30,6 @@ func TestForEachFuncPipe(t *testing.T) {
 
 	if count != 3 {
 		t.Fatal("counting ForEach pipe received 3 items but counted ", count)
-	}
-
-	close(in)
-}
-
-func TestForEachPipe(t *testing.T) {
-	in := make(chan interface{}, 10)
-	out := make(chan interface{}, 10)
-	counter := &FakeForEacher{}
-	NewPipe(in, out).ForEach(counter)
-
-	// Push in some numbers
-	for i := 0; i < 5; i++ {
-		in <- i
-	}
-
-	// Check it didn't modify
-	var result interface{}
-	for i := 0; i < 5; i++ {
-		result = <-out
-		if result.(int) != i {
-			t.Fatal("ForEachPipe modified ", i, " into ", result.(int))
-		}
-	}
-
-	if counter.count != 5 {
-		t.Fatal("ForEachPipe miscounted ", 5, " elements as ", counter.count)
 	}
 
 	close(in)

@@ -21,7 +21,7 @@ func NewPipe(in, out chan interface{}) *Pipe {
 	}
 
 	// Add the null handler (just echoes in to output)
-	pipe.FilterFunc(func(item interface{}) bool {
+	pipe.Filter(func(item interface{}) bool {
 		return true
 	})
 

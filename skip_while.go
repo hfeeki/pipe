@@ -4,29 +4,14 @@
 
 package pipe
 
-// Implement this interface in your object to pass it to Pipe.SkipWhile
-type SkipWhiler interface {
-	SkipWhile(item interface{}) bool
-}
-
 // A function which skipwhiles
 type SkipWhileFunc func(item interface{}) bool
 
 // Skip the items from the input pipe until the given function returns true.
 // After that , the rest are passed straight through.
-func (p *Pipe) SkipWhileFunc(fn SkipWhileFunc) *Pipe {
+func (p *Pipe) SkipWhile(fn SkipWhileFunc) *Pipe {
 	p.addStage()
 	go p.skipwhileHandler(fn, p.length-1)()
-
-	return p
-}
-
-// Skip the items from the input pipe until the given function returns true.
-// After that , the rest are passed straight through.
-func (p *Pipe) SkipWhile(t SkipWhiler) *Pipe {
-	p.SkipWhileFunc(func(item interface{}) bool {
-		return t.SkipWhile(item)
-	})
 
 	return p
 }

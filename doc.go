@@ -9,23 +9,17 @@ along Golang channels.
 For example, to count the number of items passing through a channel:
 
   // Define our counter
-  type PipeCounter struct {
-    Count int
-  }
-
-  // tell it what to do with each item
-  func (c *PipeCounter) ForEach(item interface{}) {
-    c.Count++ // increment the counter
-  }
+  count := 0
 
   // Set up our pipe
   input := make(chan interface{}, 5)
   output := make(chan interface{}, 5)
   pipe := NewPipe(input, output)
 
-  // Add our counter
-  counter := &PipeCounter{}
-  pipe.ForEach(counter)
+  // Add our counter into the pipe
+  pipe.ForEach(func(item interface{}) {
+    count++
+  })
 
   // Now we send some items
   input <- true
@@ -33,7 +27,7 @@ For example, to count the number of items passing through a channel:
   input <- true
 
   // Check how many have gone through
-  fmt.Println(counter.Count) // prints "3"
+  fmt.Println(count) // prints "3"
 
 You can, of course, modify the items flowing through the pipe:
 

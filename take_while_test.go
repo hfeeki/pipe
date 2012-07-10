@@ -8,20 +8,11 @@ import (
 	"testing"
 )
 
-type FakeTakeWhiler struct {
-	Continue bool
-}
-
-// returns the index of each element
-func (t *FakeTakeWhiler) TakeWhile(item interface{}) bool {
-	return t.Continue
-}
-
-func TestTakeWhileFuncPipe(t *testing.T) {
+func TestTakeWhilePipe(t *testing.T) {
 	in := make(chan interface{}, 5)
 	out := make(chan interface{}, 5)
 	take := true
-	NewPipe(in, out).TakeWhileFunc(func(item interface{}) bool {
+	NewPipe(in, out).TakeWhile(func(item interface{}) bool {
 		return take
 	})
 
@@ -29,27 +20,6 @@ func TestTakeWhileFuncPipe(t *testing.T) {
 	in <- 4
 	take = false
 	in <- 5
-
-	<-out
-	<-out
-	if _, ok := <-out; ok {
-		t.Fatal("takewhile pipe should have closed the channel after turning it off")
-	}
-
-	close(in)
-}
-
-func TestTakeWhilePipe(t *testing.T) {
-	in := make(chan interface{}, 10)
-	out := make(chan interface{}, 10)
-	taker := &FakeTakeWhiler{}
-	NewPipe(in, out).TakeWhile(taker)
-
-	// Push in some numbers
-	in <- 1
-	in <- 2
-	taker.Continue = false // turn off the taker
-	in <- 3
 
 	<-out
 	<-out

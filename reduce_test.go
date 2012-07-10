@@ -8,20 +8,10 @@ import (
 	"testing"
 )
 
-type FakeReducer struct {
-	sum int
-}
-
-// sum the elements
-func (t *FakeReducer) Reduce(item interface{}) interface{} {
-	t.sum += item.(int)
-	return t.sum
-}
-
-func TestReduceFuncPipe(t *testing.T) {
+func TestReducePipe(t *testing.T) {
 	in := make(chan interface{}, 5)
 	out := make(chan interface{}, 5)
-	NewPipe(in, out).ReduceFunc(0, func(sum, item interface{}) interface{} {
+	NewPipe(in, out).Reduce(0, func(sum, item interface{}) interface{} {
 		return sum.(int) + item.(int)
 	})
 
@@ -37,28 +27,5 @@ func TestReduceFuncPipe(t *testing.T) {
 
 	if result.(int) != 35 {
 		t.Fatal("reducing (sum) pipe received 5, 10, and 20 items but output ", result.(int))
-	}
-}
-
-func TestReducePipe(t *testing.T) {
-	in := make(chan interface{}, 10)
-	out := make(chan interface{}, 10)
-	NewPipe(in, out).Reduce(&FakeReducer{})
-
-	// Push in some numbers
-	for i := 5; i > 0; i-- {
-		in <- i
-	}
-
-	close(in)
-
-	result, ok := <-out
-	if !ok {
-		t.Fatal("output channel was closed before we retrieved the result")
-	}
-
-	expected := 5 + 4 + 3 + 2 + 1
-	if result.(int) != expected {
-		t.Fatal("reducing (sum) pipe received 5..1 items but output ", result.(int))
 	}
 }

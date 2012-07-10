@@ -8,22 +8,6 @@ import (
 	"testing"
 )
 
-type Counter struct {
-	count int
-}
-
-// returns the index of each element
-func (t *Counter) Map(item interface{}) interface{} {
-	t.count++
-	return t.count
-}
-
-// returns the last t.count when the pipe closes
-func (t *Counter) Reduce(item interface{}) interface{} {
-	t.count++
-	return t.count
-}
-
 func TestNullPipe(t *testing.T) {
 	in := make(chan interface{})
 	out := make(chan interface{})
@@ -40,9 +24,9 @@ func TestNullPipe(t *testing.T) {
 func TestMultiPipe(t *testing.T) {
 	in := make(chan interface{})
 	out := make(chan interface{})
-	NewPipe(in, out).FilterFunc(func(item interface{}) bool {
+	NewPipe(in, out).Filter(func(item interface{}) bool {
 		return (item.(int) % 5) == 0
-	}).FilterFunc(func(item interface{}) bool {
+	}).Filter(func(item interface{}) bool {
 		return (item.(int) % 2) == 0
 	})
 
