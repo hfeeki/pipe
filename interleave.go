@@ -5,16 +5,16 @@
 package pipe
 
 // Alternate messages from each channel. Sending a message from the first
-// channel, then one from the second, etc... If either input channel closes,
+// channel, then one from the second, etc... If any input channel closes,
 // the output will be closed.
-func (p *Pipe) Interleave(other chan interface{}) *Pipe {
+func (p *Pipe) Interleave(other ...chan interface{}) *Pipe {
 	p.addStage()
 	go p.interleaveHandler(other, p.length-1)()
 
 	return p
 }
 
-func (p *Pipe) interleaveHandler(other chan interface{}, pos int) func() {
+func (p *Pipe) interleaveHandler(other []chan interface{}, pos int) func() {
 	return func() {
 		// only send num items
 		for {
@@ -25,12 +25,15 @@ func (p *Pipe) interleaveHandler(other chan interface{}, pos int) func() {
 
 			p.nextChan(pos) <- a
 
-			b, ok := <-other
-			if !ok {
-				break
-			}
+			for _, c := range other {
+				b, ok := <-c
+				if !ok {
+					close(p.nextChan(pos))
+					return
+				}
 
-			p.nextChan(pos) <- b
+				p.nextChan(pos) <- b
+			}
 		}
 
 		close(p.nextChan(pos))

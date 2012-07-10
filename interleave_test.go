@@ -28,3 +28,27 @@ func TestInterleavePipe(t *testing.T) {
 		}
 	}
 }
+
+func TestMultiInterleavePipe(t *testing.T) {
+	in := make(chan interface{}, 5)
+	out := make(chan interface{}, 5)
+	other := make(chan interface{}, 5)
+	other2 := make(chan interface{}, 5)
+	NewPipe(in, out).Interleave(other, other2)
+
+	in <- 1
+	in <- 4
+	in <- 7
+	other <- 2
+	other <- 5
+	other2 <- 3
+	other2 <- 6
+
+	for i := 1; i <= 6; i++ {
+		result := <-out
+		expected := i
+		if result != expected {
+			t.Fatal("expected channel output to match", expected, "but got", result.(int))
+		}
+	}
+}
