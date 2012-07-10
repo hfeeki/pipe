@@ -11,7 +11,6 @@ import (
 func TestInterposePipe(t *testing.T) {
 	in := make(chan interface{}, 5)
 	out := make(chan interface{}, 5)
-	other := make(chan interface{}, 5)
 	NewPipe(in, out).Interpose(false)
 
 	in <- true

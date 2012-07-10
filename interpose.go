@@ -20,7 +20,7 @@ package pipe
 //
 func (p *Pipe) Interpose(item interface{}) *Pipe {
 	p.addStage()
-	go p.interposeHandler(other, p.length-1)()
+	go p.interposeHandler(item, p.length-1)()
 
 	return p
 }
