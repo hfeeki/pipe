@@ -159,6 +159,10 @@ Accept items from the input pipe until the given function returns false.
 After that, all input messages will be ignored and the output channel
 will be closed.
 
+### Tee(others ...chan interface{})
+
+Additionally send each incoming value to each other channel specified.
+
 ### Zip(others ...chan interface{})
 
 Group each message from the input channel with it's corresponding
