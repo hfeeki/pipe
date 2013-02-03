@@ -32,5 +32,4 @@ func unboundedRepeatedlyHandler(fn RepeatedlyFunc, out chan interface{}) {
 	for {
 		out <- fn()
 	}
-	close(out)
 }
