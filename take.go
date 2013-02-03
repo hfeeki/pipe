@@ -25,12 +25,7 @@ func Take(input chan interface{}, num int64) chan interface{} {
 		close(output)
 
 		// drop any extra messages
-		for {
-			_, ok := <-input
-			if !ok {
-				break
-			}
-		}
+		drain(input)
 	}()
 	return output
 }

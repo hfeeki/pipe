@@ -14,3 +14,16 @@ func NewPipe(input chan interface{}) *Pipe {
 	// echo input to output
 	return &Pipe{Output: input}
 }
+
+func forward(input, output chan interface{}) {
+	for item := range input {
+		output <- item
+	}
+
+	close(output)
+}
+
+func drain(input chan interface{}) {
+	for _ = range input {
+	}
+}

@@ -11,12 +11,7 @@ type FilterFunc func(item interface{}) bool
 func Filter(input chan interface{}, fn FilterFunc) chan interface{} {
 	output := make(chan interface{})
 	go func() {
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
+		for item := range input {
 			if fn(item) {
 				output <- item
 			}

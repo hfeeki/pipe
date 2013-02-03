@@ -21,6 +21,7 @@ func Tee(input chan interface{}, others ...chan interface{}) chan interface{} {
 
 		close(output)
 
+		// Close all the other channels as well
 		for _, c := range others {
 			close(c)
 		}

@@ -12,12 +12,7 @@ type ForEachFunc func(item interface{})
 func ForEach(input chan interface{}, fn ForEachFunc) chan interface{} {
 	output := make(chan interface{})
 	go func() {
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
+		for item := range input {
 			fn(item)
 			output <- item
 		}

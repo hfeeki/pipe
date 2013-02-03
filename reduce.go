@@ -12,12 +12,7 @@ func Reduce(input chan interface{}, initial interface{}, fn ReduceFunc) chan int
 	output := make(chan interface{})
 	var result interface{} = initial
 	go func() {
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
+		for item := range input {
 			result = fn(result, item)
 		}
 		// Input was closed, send the result

@@ -21,15 +21,7 @@ func Skip(input chan interface{}, num int64) chan interface{} {
 		}
 
 		// Return the rest
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
-			output <- item
-		}
-		close(output)
+		forward(input, output)
 	}()
 	return output
 }

@@ -27,17 +27,7 @@ func SkipWhile(input chan interface{}, fn SkipWhileFunc) chan interface{} {
 		}
 
 		// send any messages after this
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
-			output <- item
-		}
-
-		close(output)
-
+		forward(input, output)
 	}()
 	return output
 }

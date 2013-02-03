@@ -10,12 +10,7 @@ type MapFunc func(item interface{}) interface{}
 func Map(input chan interface{}, fn MapFunc) chan interface{} {
 	output := make(chan interface{})
 	go func() {
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
+		for item := range input {
 			output <- fn(item)
 		}
 		close(output)

@@ -12,12 +12,7 @@ type TakeWhileFunc func(item interface{}) bool
 func TakeWhile(input chan interface{}, fn TakeWhileFunc) chan interface{} {
 	output := make(chan interface{})
 	go func() {
-		for {
-			item, ok := <-input
-			if !ok {
-				break
-			}
-
+		for item := range input {
 			// check if we should continue
 			if !fn(item) {
 				break
@@ -26,16 +21,11 @@ func TakeWhile(input chan interface{}, fn TakeWhileFunc) chan interface{} {
 			output <- item
 		}
 
-		// hit the toggle, close the channel
+		// hit the toggle (or input is closed), close the channel
 		close(output)
 
 		// drop any extra messages
-		for {
-			_, ok := <-input
-			if !ok {
-				break
-			}
-		}
+		drain(input)
 	}()
 	return output
 }
