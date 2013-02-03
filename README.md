@@ -1,6 +1,6 @@
 # pipe
 
-Concurrent, sequential, transformations along Golang channels.
+Concurrent, sequential, functional transformations along Golang channels. Provides functional abstractions for working with data flowing through Golang channels.
 
 ## Usage
 
