@@ -8,8 +8,7 @@ package pipe
 type RepeatedlyFunc func() interface{}
 
 // Generate an infinite sequence by repeatedly calling the given function. The
-// function should take no arguments, and ideally be side-effect free. The
-// output will be x, f(x), f(f(x)), etc...
+// function should take no arguments, and ideally be side-effect free.
 func Repeatedly(fn RepeatedlyFunc, x ...int) chan interface{} {
 	out := make(chan interface{})
 
