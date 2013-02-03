@@ -12,7 +12,7 @@ import "github.com/paulbellamy/pipe"
 
 Pipes are created with the ```NewPipe(input, output chan interface{}) *Pipe``` method.
 
-After that there are several chaining methods to build up the processing. Once the pipe is prepared, simply pipe items into the input channel and retrieve the results from the output channel.
+After that there are several chaining methods to build up the processing. Once the pipe is prepared, simply pipe items into the input channel and retrieve the results from the output channel. Pipes can be added to at any time, even after messages have been sent.
 
 Be careful, because some of the transformations (e.g. Reduce, Skip) result in channels which are 'leaky'. Meaning that one item in may not equal one item out.
 

@@ -50,3 +50,26 @@ func TestClosingPipe(t *testing.T) {
 		t.Fatal("closing the input pipe did not cascade to output")
 	}
 }
+
+func TestModifyingRunningPipe(t *testing.T) {
+	in := make(chan interface{})
+	out := make(chan interface{})
+	pipe := NewPipe(in, out)
+
+	in <- 5
+	if result := <-out; result != 5 {
+		t.Fatal("Unmodified pipe received: 5 but output ", result)
+	}
+
+	pipe.Filter(func(item interface{}) bool {
+		return item.(int) < 5
+	})
+
+	in <- 6
+	in <- 3
+	if result := <-out; result != 3 {
+		t.Fatal("Modified pipe received: 6 and 3 but output ", result)
+	}
+
+	close(in)
+}
