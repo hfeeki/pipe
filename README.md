@@ -94,6 +94,10 @@ Generate an infinite sequence by repeatedly calling the given function.
 The function should take no arguments, and ideally be side-effect free.
 The output will be x, f(x), f(f(x)), etc...
 
+### Sequence(items ...interface{}) chan interface{}
+
+Generates a pipe of the elements.
+
 ## Available Transformations
 
 ### Filter(func(item interface{}) bool)
