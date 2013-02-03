@@ -104,7 +104,7 @@ Only pass through items when the filter returns true
 
 Execute a function for each item (without modifying the item)
 
-### Interleave(other ...chan interface{})
+### Interleave(others ...chan interface{})
 
 Alternate messages from each channel. Sending a message from the first
 channel, then one from the second, etc... If any input channel
