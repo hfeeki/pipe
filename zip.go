@@ -15,31 +15,34 @@ package pipe
 //   b <- 2
 //   result := <-c // result will equal []interface{}{1, 2}
 //
-func Zip(input chan interface{}, other chan interface{}) chan interface{} {
+func Zip(chans ...chan interface{}) chan interface{} {
 	output := make(chan interface{})
 	go func() {
 		// only send num items
 		for {
-			a, ok := <-input
-			if !ok {
-				break
+			var result []interface{}
+
+			for _, c := range chans {
+				value, ok := <-c
+				if !ok {
+					close(output)
+					return
+				}
+
+				result = append(result, value)
 			}
 
-			b, ok := <-other
-			if !ok {
-				break
-			}
-
-			output <- []interface{}{a, b}
+			output <- result
 		}
-
-		close(output)
 	}()
 	return output
 }
 
 // Helper for the chained constructor
-func (p *Pipe) Zip(other chan interface{}) *Pipe {
-	p.Output = Zip(p.Output, other)
+func (p *Pipe) Zip(others ...chan interface{}) *Pipe {
+	chans := []chan interface{}{p.Output}
+	chans = append(chans, others...)
+
+	p.Output = Zip(chans...)
 	return p
 }

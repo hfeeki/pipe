@@ -159,7 +159,7 @@ Accept items from the input pipe until the given function returns false.
 After that, all input messages will be ignored and the output channel
 will be closed.
 
-### Zip(other chan interface{})
+### Zip(others ...chan interface{})
 
 Group each message from the input channel with it's corresponding
 message from the other channel. This will block on the first channel
