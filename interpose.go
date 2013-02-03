@@ -19,28 +19,7 @@ package pipe
 //   // output is now closed
 //
 func Interpose(input chan interface{}, item interface{}) chan interface{} {
-	output := make(chan interface{})
-	first := true
-	go func() {
-		// only send num items
-		for {
-			a, ok := <-input
-			if !ok {
-				break
-			}
-
-			if first {
-				first = false
-			} else {
-				output <- item
-			}
-
-			output <- a
-		}
-
-		close(output)
-	}()
-	return output
+	return Interleave(input, Repeat(item))
 }
 
 // Helper for the chained constructor
