@@ -4,29 +4,30 @@
 
 package pipe
 
-// A function which filters
 type FilterFunc func(item interface{}) bool
 
-// Only pass through items when the filter returns true
-func (p *Pipe) Filter(fn FilterFunc) *Pipe {
-	p.addStage()
-	go p.filterHandler(fn, p.length-1)()
-
-	return p
-}
-
-func (p *Pipe) filterHandler(fn FilterFunc, pos int) func() {
-	return func() {
+// Apply a filtering function to a channel, which will only pass through items
+// when the filter func returns true.
+func Filter(input chan interface{}, fn FilterFunc) chan interface{} {
+	output := make(chan interface{})
+	go func() {
 		for {
-			item, ok := <-p.prevChan(pos)
+			item, ok := <-input
 			if !ok {
 				break
 			}
 
 			if fn(item) {
-				p.nextChan(pos) <- item
+				output <- item
 			}
 		}
-		close(p.nextChan(pos))
-	}
+		close(output)
+	}()
+	return output
+}
+
+// Helper for chained construction
+func (p *Pipe) Filter(fn FilterFunc) *Pipe {
+	p.Output = Filter(p.Output, fn)
+	return p
 }

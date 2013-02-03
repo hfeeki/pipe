@@ -9,9 +9,8 @@ import (
 )
 
 func TestNullPipe(t *testing.T) {
-	in := make(chan interface{})
-	out := make(chan interface{})
-	NewPipe(in, out)
+	in := make(chan interface{}, 5)
+	out := NewPipe(in).Output
 
 	in <- 5
 	if result := <-out; result != 5 {
@@ -22,13 +21,15 @@ func TestNullPipe(t *testing.T) {
 }
 
 func TestMultiPipe(t *testing.T) {
-	in := make(chan interface{})
-	out := make(chan interface{})
-	NewPipe(in, out).Filter(func(item interface{}) bool {
+	in := make(chan interface{}, 5)
+	out := NewPipe(in).
+		Filter(func(item interface{}) bool {
 		return (item.(int) % 5) == 0
-	}).Filter(func(item interface{}) bool {
+	}).
+		Filter(func(item interface{}) bool {
 		return (item.(int) % 2) == 0
-	})
+	}).
+		Output
 
 	in <- 2
 	in <- 5
@@ -42,34 +43,10 @@ func TestMultiPipe(t *testing.T) {
 
 func TestClosingPipe(t *testing.T) {
 	in := make(chan interface{})
-	out := make(chan interface{})
-	NewPipe(in, out)
+	out := NewPipe(in).Output
 
 	close(in)
 	if _, ok := <-out; ok {
 		t.Fatal("closing the input pipe did not cascade to output")
 	}
-}
-
-func TestModifyingRunningPipe(t *testing.T) {
-	in := make(chan interface{})
-	out := make(chan interface{})
-	pipe := NewPipe(in, out)
-
-	in <- 5
-	if result := <-out; result != 5 {
-		t.Fatal("Unmodified pipe received: 5 but output ", result)
-	}
-
-	pipe.Filter(func(item interface{}) bool {
-		return item.(int) < 5
-	})
-
-	in <- 6
-	in <- 3
-	if result := <-out; result != 3 {
-		t.Fatal("Modified pipe received: 6 and 3 but output ", result)
-	}
-
-	close(in)
 }

@@ -8,11 +8,11 @@ import (
 	"testing"
 )
 
-func TestForEachPipe(t *testing.T) {
-	in := make(chan interface{}, 5)
-	out := make(chan interface{}, 5)
+func TestForEach(t *testing.T) {
 	count := 0
-	NewPipe(in, out).ForEach(func(item interface{}) {
+
+	in := make(chan interface{}, 5)
+	out := ForEach(in, func(item interface{}) {
 		count++
 	})
 
@@ -30,6 +30,36 @@ func TestForEachPipe(t *testing.T) {
 
 	if count != 3 {
 		t.Fatal("counting ForEach pipe received 3 items but counted ", count)
+	}
+
+	close(in)
+}
+
+func TestForEachChainedConstructor(t *testing.T) {
+	count := 0
+	in := make(chan interface{}, 10)
+	out := NewPipe(in).
+		ForEach(func(item interface{}) {
+		count++
+	}).
+		Output
+
+	// Push in some numbers
+	for i := 0; i < 5; i++ {
+		in <- i
+	}
+
+	// Check it didn't modify
+	var result interface{}
+	for i := 0; i < 5; i++ {
+		result = <-out
+		if result.(int) != i {
+			t.Fatal("ForEachPipe modified ", i, " into ", result.(int))
+		}
+	}
+
+	if count != 5 {
+		t.Fatal("ForEachPipe miscounted ", 5, " elements as ", count)
 	}
 
 	close(in)

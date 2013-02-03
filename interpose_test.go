@@ -10,8 +10,25 @@ import (
 
 func TestInterposePipe(t *testing.T) {
 	in := make(chan interface{}, 5)
-	out := make(chan interface{}, 5)
-	NewPipe(in, out).Interpose(false)
+	out := Interpose(in, false)
+
+	in <- true
+	in <- true
+	in <- true
+
+	expected := false
+	for i := 0; i < 5; i++ {
+		result := <-out
+		expected = !expected
+		if result != expected {
+			t.Fatal("expected channel output to match", expected, "but got", result.(int))
+		}
+	}
+}
+
+func TestInterposeChainedConstructor(t *testing.T) {
+	in := make(chan interface{}, 5)
+	out := NewPipe(in).Interpose(false).Output
 
 	in <- true
 	in <- true

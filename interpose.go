@@ -18,19 +18,13 @@ package pipe
 //   <-out // 2
 //   // output is now closed
 //
-func (p *Pipe) Interpose(item interface{}) *Pipe {
-	p.addStage()
-	go p.interposeHandler(item, p.length-1)()
-
-	return p
-}
-
-func (p *Pipe) interposeHandler(item interface{}, pos int) func() {
+func Interpose(input chan interface{}, item interface{}) chan interface{} {
+	output := make(chan interface{})
 	first := true
-	return func() {
+	go func() {
 		// only send num items
 		for {
-			a, ok := <-p.prevChan(pos)
+			a, ok := <-input
 			if !ok {
 				break
 			}
@@ -38,12 +32,19 @@ func (p *Pipe) interposeHandler(item interface{}, pos int) func() {
 			if first {
 				first = false
 			} else {
-				p.nextChan(pos) <- item
+				output <- item
 			}
 
-			p.nextChan(pos) <- a
+			output <- a
 		}
 
-		close(p.nextChan(pos))
-	}
+		close(output)
+	}()
+	return output
+}
+
+// Helper for the chained constructor
+func (p *Pipe) Interpose(item interface{}) *Pipe {
+	p.Output = Interpose(p.Output, item)
+	return p
 }

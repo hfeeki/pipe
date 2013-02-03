@@ -21,16 +21,15 @@ For example, to count the number of items passing through a channel:
 ```Go
 // Define our counter
 count := 0
+counter_func := func(item interface{}) {
+  count++
+}
 
 // Set up our pipe
 input := make(chan interface{}, 5)
-output := make(chan interface{}, 5)
-pipe := NewPipe(input, output)
 
 // Add our counter into the pipe
-pipe.ForEach(func(item interface{}) {
-  count++
-})
+output := ForEach(input, counter_func)
 
 // Now we send some items
 input <- true
@@ -46,15 +45,16 @@ You can, of course, modify the items flowing through the pipe:
 ```Go
 // Set up our pipe
 input := make(chan interface{}, 5)
-output := make(chan interface{}, 5)
-
-NewPipe(input, output).Filter(func(item interface{}) bool {
-  // Only allow ints divisible by 5
-  return (item.(int) % 5) == 0
-}).Map(func(item interface{}) interface{} {
-  // Add 2 to each
-  return item.(int) + 2
-})
+output := NewPipe(input, output).
+  Filter(func(item interface{}) bool {
+    // Only allow ints divisible by 5
+    return (item.(int) % 5) == 0
+  }).
+  Map(func(item interface{}) interface{} {
+    // Add 2 to each
+    return item.(int) + 2
+  }).
+  Output
 
 // Now we send some items
 input <- 1 // will be dropped
@@ -63,7 +63,7 @@ input <- 5 // will come through as 7
 
 ## Creating Pipes
 
-### NewPipe(in, out chan interface{})
+### NewPipe(out chan interface{})
 
 Return a new Pipe object which echoes input to output. Additional
 transformations can then be 'chained' onto the pipe, to modify the output.
@@ -118,8 +118,7 @@ closes, the output will be closed. The final thing through the input
 channel will be the final item from the output channel. e.g.
 
 ```Go
-out := make(chan interface{})
-NewPipe(Range(0,3), out).Interpose('a')
+out := NewPipe(Range(0,3)).Interpose('a').Output
 <-out // 0
 <-out // 'a'
 <-out // 1

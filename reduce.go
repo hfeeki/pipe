@@ -4,23 +4,16 @@
 
 package pipe
 
-// A function which reduces
 type ReduceFunc func(result, item interface{}) interface{}
 
 // Accumulate the result of the reduce function being called on each item, then
 // when the input channel is closed, pass the result to the output channel
-func (p *Pipe) Reduce(initial interface{}, fn ReduceFunc) *Pipe {
-	p.addStage()
-	go p.reducerHandler(initial, fn, p.length-1)()
-
-	return p
-}
-
-func (p *Pipe) reducerHandler(initial interface{}, fn ReduceFunc, pos int) func() {
+func Reduce(input chan interface{}, initial interface{}, fn ReduceFunc) chan interface{} {
+	output := make(chan interface{})
 	var result interface{} = initial
-	return func() {
+	go func() {
 		for {
-			item, ok := <-p.prevChan(pos)
+			item, ok := <-input
 			if !ok {
 				break
 			}
@@ -28,7 +21,15 @@ func (p *Pipe) reducerHandler(initial interface{}, fn ReduceFunc, pos int) func(
 			result = fn(result, item)
 		}
 		// Input was closed, send the result
-		p.nextChan(pos) <- result
-		close(p.nextChan(pos))
-	}
+		output <- result
+		close(output)
+	}()
+	return output
+}
+
+// Accumulate the result of the reduce function being called on each item, then
+// when the input channel is closed, pass the result to the output channel
+func (p *Pipe) Reduce(initial interface{}, fn ReduceFunc) *Pipe {
+	p.Output = Reduce(p.Output, initial, fn)
+	return p
 }

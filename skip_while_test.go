@@ -10,11 +10,31 @@ import (
 
 func TestSkipWhilePipe(t *testing.T) {
 	in := make(chan interface{}, 5)
-	out := make(chan interface{}, 5)
-	NewPipe(in, out).SkipWhile(func(item interface{}) bool {
+	out := SkipWhile(in, func(item interface{}) bool {
 		return item.(int) < 3
 	})
 
+	in <- 1
+	in <- 2
+	in <- 3
+
+	result := <-out
+	if result != 3 {
+		t.Fatal("skipwhile should have skipped all results until 3, but output", result)
+	}
+
+	close(in)
+}
+
+func TestSkipWhileChainedConstructor(t *testing.T) {
+	in := make(chan interface{}, 10)
+	out := NewPipe(in).
+		SkipWhile(func(item interface{}) bool {
+		return item.(int) < 3
+	}).
+		Output
+
+	// Push in some numbers
 	in <- 1
 	in <- 2
 	in <- 3
